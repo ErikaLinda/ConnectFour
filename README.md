@@ -45,14 +45,11 @@ view gets run is now an Ant parameter. Specifically, running
 ```bash
 $> ant run -Dview=graphical
 ```
-should 
-launch your graphical view. Likewise
+should launch your graphical view. Likewise
 ```bash
 $> ant run -Dview=console
 ```
-should launch the console view 
-(essentially run Homework 1). Again, the Ant build file has been updated to support this additional
- variable. Its value is presented to ConnectFourTest as a member of the `arg` array parameter in main.
+should launch the console view (essentially run Homework 1). Again, the Ant build file has been updated to support this additional variable. Its value is presented to ConnectFourTest as a member of the `arg` array parameter in main.
  ConnectFourTest gives more details.
 
 

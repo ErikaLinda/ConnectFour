@@ -111,7 +111,7 @@ public class ConnectFour extends Game{
      * check if placeDisk arguments are invalid
      */
     private boolean invalidPlacement(int row, int col){
-    	if(col < 0 || col > 6) return true;
+    	if(col < 0 || col > 6 || row < 0 || row > 5) return true;
 
     	// check if the column has free space
     	for(int i = 0; i < 6; i++){
