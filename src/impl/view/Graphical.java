@@ -30,6 +30,11 @@ import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import java.util.List;
 import javafx.beans.InvalidationListener;
+import javafx.scene.text.Font;
+import javafx.geometry.HPos;
+import javafx.geometry.Insets;
+import javafx.geometry.VPos;
+import javafx.geometry.Pos;
 
 public class Graphical extends Application implements Observer {
 	private Game game = new ConnectFour();
@@ -49,15 +54,18 @@ public class Graphical extends Application implements Observer {
 		
  		// Create main game field
         this.createGrid();
+        BorderPane.setMargin(mainPane, new Insets(12,12,12,12));
         canvas.setCenter(mainPane);
 
         // Create the sidebar with game status notifications
     	this.createSidePane();
+    	BorderPane.setMargin(sidePane, new Insets(12,12,12,12));
         canvas.setRight(sidePane);
 
     
         // Create a scene and place it in the stage
-        Scene scene = new Scene(canvas);
+        // canvas.setStyle("-fx-background-color: transparent;");
+        Scene scene = new Scene(canvas, Color.BLACK);
         primaryStage.setTitle("Connect Four"); // Set the stage title
         primaryStage.setScene(scene); // Place the scene in the stage
         primaryStage.show(); // Display the stage   
@@ -82,13 +90,15 @@ public class Graphical extends Application implements Observer {
 
     private void createSidePane(){
     	plyrsTurnCirc.setStroke(Color.BLACK);
-    	winningPlyrCirc.setStroke(Color.BLACK);
-    	winningPlyrCirc.setFill(Color.WHITE);
-        Label playersTurn = new Label("Current Player", plyrsTurnCirc);
-    	Label winningPlayer = new Label("Winning Player", winningPlyrCirc);
+        Label playersTurn = new Label("Current Player");
+        playersTurn.setFont(Font.font("Cambria", 24));
+        GridPane.setHalignment(playersTurn, HPos.CENTER);
+        GridPane.setHalignment(plyrsTurnCirc, HPos.CENTER);
+
         sidePane.add(playersTurn, 1, 1);
-        sidePane.add(winningPlayer, 1, 2);
-		updateSideBarNotifications();
+        sidePane.add(plyrsTurnCirc, 1, 2);
+        
+		updateSidebarNotifications();
     }
 
     private void placeDiskGraphical(VBox col, int colNum){
@@ -117,9 +127,8 @@ public class Graphical extends Application implements Observer {
 		}
     }
 
-    private void updateSideBarNotifications() {
+    private void updateSidebarNotifications() {
     	Chip currentPlayer = game.getCurrentPlayer();
-    	Chip winningPlayer = Chip.EMPTY;
     	
     	// while game continues
     	if(!game.isGameOver()){
@@ -128,33 +137,52 @@ public class Graphical extends Application implements Observer {
 	    	}else if(currentPlayer == Chip.RED){
 	    		plyrsTurnCirc.setFill(Color.ORANGE);
 	    	}
+	    	if(game.isGameOver()) gameOverGraphical();
 	    // when game is over
     	}else{
-    		try{
-				winningPlayer = game.getWinningPlayer();
-			}catch (GameStateException e) {
-	    		System.out.println(e);
-			}
-    		if(winningPlayer == Chip.BLUE){
-    			winningPlyrCirc.setFill(Color.GREEN);
-	    	}else if(winningPlayer == Chip.RED){
-	    		winningPlyrCirc.setFill(Color.ORANGE);
-	    	}
-	    	plyrsTurnCirc.setFill(Color.WHITE);
+    		gameOverGraphical();
     	}
     }
 
     private EventHandler<MouseEvent> colClickHandler = event ->{
-    	// determine which column was clicked
-		VBox col = (VBox)event.getSource();
-		GridPane pane = (GridPane)col.getParent();
-		int clickedColumnNum = pane.getColumnIndex(col);
-		// System.out.println(clickedColumn);
-		
-		// placeDisk and display on screen the changes
-		placeDiskGraphical(col, clickedColumnNum);
-		updateSideBarNotifications();
+    	if(!game.isGameOver()){
+    		// determine which column was clicked
+			VBox col = (VBox)event.getSource();
+			GridPane pane = (GridPane)col.getParent();
+			int clickedColumnNum = pane.getColumnIndex(col);
+			// System.out.println(clickedColumn);
+			
+			// placeDisk and display on screen the changes
+			placeDiskGraphical(col, clickedColumnNum);
+			updateSidebarNotifications();
+    	}
+    	
     };
+
+    private void gameOverGraphical(){
+    	sidePane.getChildren().clear();
+
+    	try{
+			Chip winningPlayer = game.getWinningPlayer();
+			if(winningPlayer == Chip.BLUE){
+				winningPlyrCirc.setFill(Color.GREEN);
+			}else if(winningPlayer == Chip.RED){
+				winningPlyrCirc.setFill(Color.ORANGE);
+			}
+		   	Label winningPlayerLabel = new Label("Winning Player");
+		   	winningPlayerLabel.setFont(Font.font("Cambria", 24));
+		   	GridPane.setHalignment(winningPlyrCirc, HPos.CENTER);
+        	GridPane.setHalignment(winningPlayerLabel, HPos.CENTER);
+		   	sidePane.add(winningPlayerLabel, 1, 1);
+		   	sidePane.add(winningPlyrCirc, 1, 2);
+		}catch (GameStateException e) {
+    		System.out.println(e);
+    		Label tieLabel = new Label("It's a tie!");
+    		tieLabel.setFont(Font.font("Cambria", 24));
+    		sidePane.add(tieLabel, 1, 1);
+		}
+		
+    }
 
     
 	 /*
