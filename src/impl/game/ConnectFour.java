@@ -82,15 +82,20 @@ public class ConnectFour extends Game{
      * @throws GameStateException if no winner has been established.
      */
     public Chip getWinningPlayer() throws GameStateException{
-    	if(!this.isGameOver() || this.isTie()){
+        // game is not yet over
+    	if(!this.isGameOver()) {
     		throw new GameStateException("There is no winner.");
-    	}
+        // game is over but there is no winner
+    	}else if(!this.isWinner((player1Turn) ? player1 : player2)){
+            throw new GameStateException("There is no winner.");
+        }
     	return this.getCurrentPlayer();
     }
     
 
     public Chip getCurrentPlayer(){
-    	if(this.isTie()){
+        // check if the last disk before a tie did not create a winner
+    	if(this.isTie() && !this.isWinner((player1Turn) ? player1 : player2)){
     		return Chip.EMPTY;
     	}
     	else {
@@ -99,7 +104,7 @@ public class ConnectFour extends Game{
     }
 
     public boolean isGameOver(){
-    	return (this.isTie() || this.isWinner(this.getCurrentPlayer())) ? true : false;
+    	return (this.isWinner(this.getCurrentPlayer()) || this.isTie() ) ? true : false;
     }
 
 

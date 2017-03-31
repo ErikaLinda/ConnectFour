@@ -1,8 +1,19 @@
+/***************
+Erika Linda Zogla 
+Software Engineering
+Prof. Jerome White
+March 31, 2017
+
+ConnectFour game with GUI
+
+Implementation of ConnectFour GUI.
+
+*************/
+
 package impl.view;
 
 import api.Game;
 import api.Chip;
-// import impl.controller.Controller;
 import impl.game.ConnectFour;
 
 import exc.GameStateException;
@@ -12,29 +23,24 @@ import java.util.Observer;
 import java.util.Observable;
 
 import javafx.application.Application;
-import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.Button;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.paint.Paint;
-import  javafx.beans.binding.Bindings;
-import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
-import javafx.collections.ObservableList;
 import javafx.scene.Node;
-import java.util.List;
-import javafx.beans.InvalidationListener;
 import javafx.scene.text.Font;
+import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
-import javafx.geometry.VPos;
-import javafx.geometry.Pos;
+import javafx.collections.ObservableList;
+import javafx.application.Platform;
 
 public class Graphical extends Application implements Observer {
 	private Game game = new ConnectFour();
@@ -45,7 +51,6 @@ public class Graphical extends Application implements Observer {
 	private Circle plyrsTurnCirc = new Circle(20);
     private Circle winningPlyrCirc = new Circle(20);
     
-
 
 	@Override
 	public void start(Stage primaryStage) {
@@ -61,17 +66,16 @@ public class Graphical extends Application implements Observer {
     	this.createSidePane();
     	BorderPane.setMargin(sidePane, new Insets(12,12,12,12));
         canvas.setRight(sidePane);
-
     
         // Create a scene and place it in the stage
-        // canvas.setStyle("-fx-background-color: transparent;");
-        Scene scene = new Scene(canvas, Color.BLACK);
+        Scene scene = new Scene(canvas);
         primaryStage.setTitle("Connect Four"); // Set the stage title
         primaryStage.setScene(scene); // Place the scene in the stage
         primaryStage.show(); // Display the stage   
 
     }
 
+    // initialize game grid
     private void createGrid(){
     	Rectangle rect;
     	VBox column;
@@ -82,12 +86,13 @@ public class Graphical extends Application implements Observer {
     			rect.setFill(Color.WHITE);
     			rect.setStroke(Color.BLACK);
     			column.getChildren().add(rect);
-    			column.setOnMouseClicked(colClickHandler);
     		}
+    		column.setOnMouseClicked(colClickHandler);
     		mainPane.add(column, i, 0);
     	}
     }
 
+    // initialize and format sidebar 
     private void createSidePane(){
     	plyrsTurnCirc.setStroke(Color.BLACK);
         Label playersTurn = new Label("Current Player");
@@ -97,10 +102,12 @@ public class Graphical extends Application implements Observer {
 
         sidePane.add(playersTurn, 1, 1);
         sidePane.add(plyrsTurnCirc, 1, 2);
-        
+        sidePane.setVgap(10);
+        addButtons();
 		updateSidebarNotifications();
     }
 
+    // places disk in both the Model and the View
     private void placeDiskGraphical(VBox col, int colNum){
     	try{
 				game.placeDisk(colNum);
@@ -113,7 +120,6 @@ public class Graphical extends Application implements Observer {
 			}
 		Chip[][] board = game.getBoard();
 		ObservableList<Node> currentColumn = col.getChildren();
-		// System.out.println(currentColumn);
 		
 		for(int i = 0; i < rowNum; i++){
 			Rectangle currentRect;
@@ -127,62 +133,103 @@ public class Graphical extends Application implements Observer {
 		}
     }
 
+    // updates current player
     private void updateSidebarNotifications() {
     	Chip currentPlayer = game.getCurrentPlayer();
-    	
-    	// while game continues
-    	if(!game.isGameOver()){
-    		if(currentPlayer == Chip.BLUE){
-    			plyrsTurnCirc.setFill(Color.GREEN);
-	    	}else if(currentPlayer == Chip.RED){
-	    		plyrsTurnCirc.setFill(Color.ORANGE);
-	    	}
-	    	if(game.isGameOver()) gameOverGraphical();
-	    // when game is over
-    	}else{
-    		gameOverGraphical();
+ 
+		if(currentPlayer == Chip.BLUE){
+			plyrsTurnCirc.setFill(Color.GREEN);
+    	}else if(currentPlayer == Chip.RED){
+    		plyrsTurnCirc.setFill(Color.ORANGE);
     	}
     }
 
-    private EventHandler<MouseEvent> colClickHandler = event ->{
-    	if(!game.isGameOver()){
-    		// determine which column was clicked
-			VBox col = (VBox)event.getSource();
-			GridPane pane = (GridPane)col.getParent();
-			int clickedColumnNum = pane.getColumnIndex(col);
-			// System.out.println(clickedColumn);
-			
-			// placeDisk and display on screen the changes
-			placeDiskGraphical(col, clickedColumnNum);
-			updateSidebarNotifications();
-    	}
-    	
-    };
-
+    // displays game stats when the game is over
     private void gameOverGraphical(){
     	sidePane.getChildren().clear();
 
+    	Label gameOverLbl = new Label("Game Over!");
+		gameOverLbl.setFont(Font.font("Cambria", 28));
+	   	GridPane.setHalignment(gameOverLbl, HPos.CENTER);
+	   	sidePane.add(gameOverLbl, 1, 1);
+
     	try{
+    		// display the winner
 			Chip winningPlayer = game.getWinningPlayer();
 			if(winningPlayer == Chip.BLUE){
 				winningPlyrCirc.setFill(Color.GREEN);
 			}else if(winningPlayer == Chip.RED){
 				winningPlyrCirc.setFill(Color.ORANGE);
 			}
+			winningPlyrCirc.setStroke(Color.BLACK);
+			GridPane.setHalignment(winningPlyrCirc, HPos.CENTER);
+			sidePane.add(winningPlyrCirc, 1, 3);
+		   	
 		   	Label winningPlayerLabel = new Label("Winning Player");
-		   	winningPlayerLabel.setFont(Font.font("Cambria", 24));
-		   	GridPane.setHalignment(winningPlyrCirc, HPos.CENTER);
-        	GridPane.setHalignment(winningPlayerLabel, HPos.CENTER);
-		   	sidePane.add(winningPlayerLabel, 1, 1);
-		   	sidePane.add(winningPlyrCirc, 1, 2);
+		   	winningPlayerLabel.setFont(Font.font("Cambria", 20));
+		   	GridPane.setHalignment(winningPlayerLabel, HPos.CENTER);
+		   	sidePane.add(winningPlayerLabel, 1, 2);
+		   
 		}catch (GameStateException e) {
-    		System.out.println(e);
-    		Label tieLabel = new Label("It's a tie!");
+    		// display tie notification
+    		Label tieLabel = new Label("It is a tie!");
     		tieLabel.setFont(Font.font("Cambria", 24));
-    		sidePane.add(tieLabel, 1, 1);
+    		GridPane.setHalignment(tieLabel, HPos.CENTER);
+    		sidePane.add(tieLabel, 1, 2);
 		}
-		
+		addButtons();
+
     }
+
+    // adds "Play Again" and "Quit" buttons for convenience
+    private void addButtons(){
+    	// button to play again
+		Button playAgainBtn = new Button("Play Again");
+		playAgainBtn.setOnMouseClicked(playAgainHandler);
+		GridPane.setMargin(playAgainBtn, new Insets(20, 0, 4, 0));
+		playAgainBtn.setMinWidth(70);
+		playAgainBtn.setMinHeight(30);
+		GridPane.setHalignment(playAgainBtn, HPos.CENTER);
+		sidePane.add(playAgainBtn, 1, 4);
+
+		// button to exit the game
+		Button quitBtn = new Button("Quit");
+		quitBtn.setOnMouseClicked(quitHandler);
+		quitBtn.setMinWidth(70);
+		quitBtn.setMinHeight(30);
+		GridPane.setHalignment(quitBtn, HPos.CENTER);
+		sidePane.add(quitBtn, 1, 5);
+    }
+
+    /**************************
+    Mouse click event handlers
+    ***************************/
+
+    private EventHandler<MouseEvent> colClickHandler = event ->{
+		if(!game.isGameOver()){
+			// determine which column was clicked
+			VBox col = (VBox)event.getSource();
+			GridPane pane = (GridPane)col.getParent();
+			int clickedColumnNum = pane.getColumnIndex(col);
+			
+			// placeDisk and display the changes  on screen
+			placeDiskGraphical(col, clickedColumnNum);
+			if(game.isGameOver()) gameOverGraphical();
+			else updateSidebarNotifications();
+		}
+    };
+
+    private EventHandler<MouseEvent> playAgainHandler = event ->{
+    	this.game = new ConnectFour();
+    	sidePane.getChildren().clear();
+    	mainPane.getChildren().clear();
+    	createGrid();
+		createSidePane();
+    };
+
+    private EventHandler<MouseEvent> quitHandler = event ->{
+    	Platform.exit();
+    };
 
     
 	 /*
@@ -190,102 +237,7 @@ public class Graphical extends Application implements Observer {
      * required by the Observer interface.
      */
 
-    public void update(Observable o){
-    	this.update(o, null);
-    }
-
     public void update(Observable o, Object args){
-    	if (o instanceof Game){
-    		Game game = (Game) o;
-    		this.render(game);
-    	}
-     }
-
-     public void render(Game game){
-     // 	Chip[][] board = game.getBoard();
-
-     // 	// Pane to hold the game's grid
-     //    GridPane pane = new GridPane(); 
-     //    for (int i = 0; i < 6; i++)
-     //        for (int j = 0; j < 7; j++)
-     //            pane.add(new Circle(20), j, i);
-
-     //    BorderPane borderPane = new BorderPane();
-     //    borderPane.setCenter(pane);
-
-     //    // Create the sidebar with game status notifications
-     //    GridPane sidePane = new GridPane();
-     //    Label playersTurn = new Label("Current Player");
-    	// Label winningPlayer = new Label("Winning Player");
-    	// Circle plyrsTurnCirc = new Circle(20);
-    	// Circle winningPlyrCirc = new Circle(20);
-     //    sidePane.add(playersTurn, 1, 1);
-     //    sidePane.add(plyrsTurnCirc, 2, 1);
-     //    sidePane.add(winningPlayer, 1, 2);
-     //    sidePane.add(winningPlyrCirc, 2, 2);
-     //    borderPane.setRight(sidePane);
-
-     //    // Stage primaryStage = new Stage();
-    
-     //    // Create a scene and place it in the stage
-     //    Scene scene = new Scene(borderPane, 450, 300);
-     //    primaryStage.setTitle("Connect Four"); // Set the stage title
-     //    primaryStage.setScene(scene); // Place the scene in the stage
-     //    primaryStage.show(); // Display the stage   
-     	
-     	// GridPane root = new GridPane();
-     	// int col = game.getColumns();
-
-     	// Chip [][] board = game.getBoard();
-    	// Circle circ = new Circle(20);
-    	// GridPane.setConstraints(circ, 1, 1);
-    	// root.getChildren().add(circ);
-    
-		
-
-		// Circle circ = new Circle(20);
-		// Circle circ1 = new Circle(40, 40, 30);
-		// Circle circ2 = new Circle(40, 40, 30);
-		// GridPane.setConstraints(circ, 3, 1);
-		// GridPane.setConstraints(circ1, 2, 1);
-		// GridPane.setConstraints(circ2, 1, 1);
-
-	 //    root.getColumnConstraints().add(column1, column2);
-	    
-		
-       
-     	// root = this.addChildren(root, game);
     	
-
-    	// for(int i = 0; i < game.getRows(); i++){
-    	// 	for(int j = 0; j < game.getColumns(); j++){
-    	// 		Chip chip = board[i][j];
-    	// 		Circle circ = new Circle(20);
-    	// 		GridPane.setConstraints(circ, j, i);
-    	// 		if(chip == Chip.RED){
-    	// 			circ.setFill(Color.ORCHID);
-    	// 		}else if(chip == Chip.BLUE){
-    	// 			circ.setFill(Color.DARKGREEN);
-    	// 		}else{
-    	// 			circ.setFill(Color.WHITE);
-    	// 		}
-    	// 		root.getChildren().add(circ);
-    	// 	}
-    	// }
-
-    // 	Scene scene = new Scene(root, 400, 300);
-
-    //     stage.setTitle("ConnectFour");
-    //     stage.setScene(scene);
-    //     stage.show();
-    // }
-
-    // private GridPane addChildren(GridPane root, Game game){
-    // 	Chip [][] board = game.getBoard();
-    // 	 Circle circ = new Circle(20);
-    // 	GridPane.setConstraints(circ, 1, 1);
-    // 	root.getChildren().add(circ);
-    // 	return root;
-
-    }
+     }
 }
