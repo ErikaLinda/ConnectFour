@@ -2,9 +2,9 @@
 Erika Linda Zogla 
 Software Engineering
 Prof. Jerome White
-March 4, 2017
+March 31, 2017
 
-ConnectFour game
+ConnectFour game with GUI
 
 Implementation of ConnectFour with Observer pattern and Junit testing.
 
@@ -69,7 +69,7 @@ public class ConnectFour extends Game{
 
     	// give turn to the other player if game is not over
     	if(!this.isGameOver()){
-    		player1Turn = (player1Turn) ? false : true;
+    		player1Turn = !player1Turn;
     	}
 
     	// notify observers
@@ -94,8 +94,7 @@ public class ConnectFour extends Game{
     
 
     public Chip getCurrentPlayer(){
-        // check if the last disk before a tie did not create a winner
-    	if(this.isTie() && !this.isWinner((player1Turn) ? player1 : player2)){
+    	if(this.isTie()){
     		return Chip.EMPTY;
     	}
     	else {
@@ -104,7 +103,7 @@ public class ConnectFour extends Game{
     }
 
     public boolean isGameOver(){
-    	return (this.isWinner(this.getCurrentPlayer()) || this.isTie() ) ? true : false;
+    	return (this.isTie() || this.isWinner(this.getCurrentPlayer()));
     }
 
 
@@ -136,7 +135,8 @@ public class ConnectFour extends Game{
     			if(c == Chip.EMPTY) return false;
     		}
     	}
-    	return true;
+        // check if the last piece did not create a winner
+    	return !this.isWinner((player1Turn) ? player1 : player2);
     }
 
     /*
