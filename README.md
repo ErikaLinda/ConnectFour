@@ -1,9 +1,28 @@
 Implementation of the [Connect Four](https://en.wikipedia.org/wiki/Connect_Four) game by Erika Zogla for Software Engineering (Spring 2017) course by Prof. Jerome White at New York University Abu Dhabi. The implementation leverges JavaFX and the Observer design pattern. 
 
+## Launching the application
 
-The assignment brief:
 
-# Homework 2: Graphical Connect Four
+The application is run and build from the command prompt using [Apache Ant library](http://ant.apache.org/). To launch the game enter the following in the command prompt
+```bash
+$> ant run
+```
+
+To run the jUnit tests written by the entire class
+```bash
+$> ant test
+```
+My jUnit test are in the folder 'elo239'.
+
+To compile
+```bash
+$> ant compile
+```
+
+
+
+
+# The assignment brief
 
 
 
