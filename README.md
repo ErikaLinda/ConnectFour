@@ -1,3 +1,8 @@
+Implementation of the [Connect Four](https://en.wikipedia.org/wiki/Connect_Four) game using JavaFX to create the proper game experience. Moreover, the assignment had to leverage the Observer design pattern.
+
+
+The original assignment brief:
+
 # Homework 2: Graphical Connect Four
 
 
@@ -40,18 +45,11 @@ implementations should be added to `src/impl/controller`.
 The file ConnectFourTest.java has been added to the `test.system` package. This file is 
 intended to replace ConnectFourConsoleTest.java. However, we have added it to the repository 
 so that it does not overwrite your old files. The code can still be run via Ant -- the build 
-file has been updated to work with it (ConnectFourTest.java). Further, differentiating which 
-view gets run is now an Ant parameter. Specifically, running
+file has been updated to work with it (ConnectFourTest.java). Specifically, running
 ```bash
-$> ant run -Dview=graphical
+$> ant run
 ```
-should launch your graphical view. Likewise
-```bash
-$> ant run -Dview=console
-```
-should launch the console view (essentially run Homework 1). Again, the Ant build file has been updated to support this additional variable. Its value is presented to ConnectFourTest as a member of the `arg` array parameter in main.
- ConnectFourTest gives more details.
-
+should launch your graphical view. 
 
 
 ## Adding a GUI
