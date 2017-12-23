@@ -1,7 +1,7 @@
 Implementation of the [Connect Four](https://en.wikipedia.org/wiki/Connect_Four) game by Erika Zogla for Software Engineering (Spring 2017) course by Prof. Jerome White at New York University Abu Dhabi. The implementation leverges JavaFX and the Observer design pattern. 
 
 
-The original assignment brief:
+The assignment brief:
 
 # Homework 2: Graphical Connect Four
 
